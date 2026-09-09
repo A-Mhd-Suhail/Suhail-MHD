@@ -1,0 +1,12 @@
+{
+  "name": "MHD Hospital",
+  "description": "My Health Defense Hospital 24x7 patient and doctor portal.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
