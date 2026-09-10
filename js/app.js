@@ -2,6 +2,10 @@
    MHD HOSPITAL v16.2 — My Health Defense Hospital 24×7
 
    ============================================================ */
+function loadScript(src) {
+  return new Promise((resolve, reject) => { const s = document.createElement('script'); s.src = src; s.onload = resolve; s.onerror = reject; document.head.appendChild(s); });
+}
+function loadCss(href) { if (!document.querySelector('link[href="' + href + '"]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.appendChild(l); } }
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -352,10 +356,10 @@ auth.onAuthStateChanged(async user => {
   if (!user) { $('#screen-auth').classList.remove('hidden'); $('#app').classList.add('hidden'); showAuth('login'); return; }
   try {
     let snap = null;
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
       const s = await db.collection('users').doc(user.uid).get();
       if (s.exists) { snap = s; break; }
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 250));
     }
     if (!snap) { toast('Profile missing — please register again.'); await auth.signOut(); return; }
     ME = { id: user.uid, ...snap.data() };
@@ -663,7 +667,11 @@ function renderDoctorMap() {
   if (info) info.textContent = 'Live GPS • shared only while ON DUTY • deleted on logout • older than 6 min = hidden.';
   const mapEl = $('#docMap');
   if (!mapEl || !mapEl.offsetParent) return;
-  if (typeof L === 'undefined') { mapEl.innerHTML = '<p class="muted">Map library could not load.</p>'; return; }
+  if (typeof L === 'undefined') {
+    loadCss('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+    loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(() => renderDoctorMap()).catch(() => { mapEl.innerHTML = '<p class="muted">Map library could not load.</p>'; });
+    return;
+  }
   if (!cvMap) {
     cvMap = L.map('docMap').setView([13.0827, 80.2707], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(cvMap);
@@ -735,6 +743,10 @@ function renderQR() {
   if (qc) qc.innerHTML = kvRows([['Identity', ME.name + ' • ' + ageOf(ME.dob) + ' • ' + ME.gender], ['Blood Group', ME.bloodGroup || '—'], ['Allergies', ME.allergies || 'None'], ['Conditions', ME.conditions || 'None'], ['Emergency Contact', payload.emergencyContact || '—'], ['Issued (date • time)', payload.issuedDate + ' • ' + payload.issuedTime], ['🎟️ Today Queue', q ? '#' + q + ' — ' + nextAppt.doctorName + ' at ' + nextAppt.time : 'No appointment today'], ['Mode', '🚑 Emergency = critical info only • 📖 Full record = consent required']]);
   const box = $('#qrBox'); if (!box) return;
   box.innerHTML = '';
+  if (typeof QRCode === 'undefined') {
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js').then(() => renderQR()).catch(() => { box.textContent = 'QR library failed to load.'; });
+    return;
+  }
   try { new QRCode(box, { text: JSON.stringify(payload), width: 190, height: 190, colorDark: '#111', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M }); } catch (e) { box.textContent = 'QR library failed to load.'; }
 }
 
