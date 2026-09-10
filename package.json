@@ -8,6 +8,7 @@
     "build": "echo 'No build required'"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^4.19.2"
   }
 }
