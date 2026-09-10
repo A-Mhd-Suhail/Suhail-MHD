@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MHD Hospital — My Health Defense Hospital 24×7</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- ================= AUTH SCREEN ================= -->
+<section id="screen-auth">
+  <div class="auth-layout">
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+      <div class="auth-brand-content">
+        <div class="brand-top">
+          <div class="mhd-logo-mark">
+            <svg viewBox="0 0 44 44" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" rx="10" fill="url(#logo-grad)"/>
+              <path d="M22 11V33M11 22H33" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+              <path d="M15 15L29 29M29 15L15 29" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="logo-grad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2563EB"/>
+                  <stop offset="1" stop-color="#0284C7"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span class="mhd-logo-text">MHD</span>
+          </div>
+          <h1 class="brand-title-minimal">MHD HOSPITAL</h1>
+          <div class="brand-subtext-minimal">MY HEALTH DEFENSE HOSPITAL 24×7</div>
+          <p class="brand-tagline">One Patient. One Medical Journey.</p>
+        </div>
+        
+        <div class="brand-bottom">
+          <div class="trust-indicators">
+            <div class="trust-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>24×7 Healthcare Access</span>
+            </div>
+            <div class="trust-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Secure Health Records</span>
+            </div>
+            <div class="trust-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              <span>Patient-Centered Care</span>
+            </div>
+          </div>
+          <div class="sdg-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            <span>ALIGNED WITH THE UNITED NATIONS SUSTAINABLE DEVELOPMENT GOALS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+      <div class="auth-top-controls">
+        <select id="langSelAuth" class="theme-select minimal-select" title="Language"></select>
+        <select id="themeSelAuth" class="theme-select minimal-select" title="Theme">
+          <option value="light">Light Mode</option>
+          <option value="dark">Dark Mode</option>
+          <option value="pink">Pink Mode</option>
+        </select>
+      </div>
+
+      <div class="auth-card-wrapper">
+        <div class="auth-card-minimal">
+          <div id="authLoginView">
+            <h3 class="auth-heading">Welcome back</h3>
+            <p class="auth-sub">Sign in to your MHD Hospital account</p>
+            <form id="formLogin" class="auth-form-minimal">
+              <div class="form-group">
+                <label class="label-minimal">Role</label>
+                <div class="select-wrapper">
+                  <select id="loginRole" class="input-minimal">
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="hospital">Hospital Admin</option>
+                  </select>
+                  <svg class="select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="label-minimal">Email address</label>
+                <input id="loginEmail" class="input-minimal" type="email" placeholder="Enter your email address" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="label-minimal">Password</label>
+                <div class="password-wrapper">
+                  <input id="loginPass" class="input-minimal" type="password" placeholder="Enter your password" required>
+                  <button type="button" class="password-toggle" onclick="const p=document.getElementById('loginPass'); p.type=p.type==='password'?'text':'password'; this.classList.toggle('show');">
+                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="auth-row-minimal">
+                <label class="checkbox-label"><input type="checkbox" id="rememberMe" checked> <span class="checkbox-text">Remember me</span></label>
+                <a class="forgot-link" data-act="forgot-pass">Forgot password?</a>
+              </div>
+              
+              <button class="btn-primary-minimal" type="submit">Sign in</button>
+            </form>
+            <p class="auth-alt-minimal">Don't have an account? <a class="register-link" data-act="show-register">Create an account</a></p>
+          </div>
+
+<div id="authRegisterView" class="hidden">
+        <h3>Register</h3>
+        <p class="sub">Create your MHD account to continue.</p>
+        <form id="formReg" class="auth-form" novalidate>
+          <div class="reg-pills">
+            <button type="button" class="reg-pill active" data-regrole="patient">👤 Patient</button>
+            <button type="button" class="reg-pill" data-regrole="doctor">👨‍⚕️ Doctor</button>
+            <button type="button" class="reg-pill" data-regrole="hospital">🏥 Hospital</button>
+          </div>
+          <div id="regPatient">
+            <div class="row2">
+              <div><label class="label">Full Name *</label>
+                <div class="mic-row"><input id="rpName" class="input"><button type="button" class="mic" data-act="mic" data-target="rpName">🎙️</button></div></div>
+              <div><label class="label">Date of Birth *</label><input id="rpDob" type="date" class="input"></div>
+            </div>
+            <div class="row2">
+              <div><label class="label">Gender *</label>
+                <select id="rpGender" class="input"><option>Male</option><option>Female</option><option>Other</option></select></div>
+              <div><label class="label">Blood Group</label>
+                <select id="rpBlood" class="input"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+            </div>
+            <div class="row2">
+              <div><label class="label">Phone *</label><input id="rpPhone" class="input"></div>
+              <div><label class="label">Aadhaar Number *</label><input id="rpAadhaar" class="input" placeholder="12-digit" maxlength="12"></div>
+            </div>
+            <label class="label">Address</label>
+            <div class="mic-row"><textarea id="rpAddress" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="rpAddress">🎙️</button></div>
+            <div class="row2">
+              <div><label class="label">Emergency Contact Name</label><input id="rpEName" class="input"></div>
+              <div><label class="label">Emergency Contact Phone</label><input id="rpEPhone" class="input"></div>
+            </div>
+            <div class="row2">
+              <div><label class="label">Height (cm)</label><input id="rpHeight" type="number" class="input"></div>
+              <div><label class="label">Weight (kg)</label><input id="rpWeight" type="number" class="input"></div>
+            </div>
+            <label class="label">⚠️ Allergies</label>
+            <div class="mic-row"><textarea id="rpAllergies" class="input" rows="2" placeholder="e.g. Penicillin (medicine), Dust (other)"></textarea><button type="button" class="mic" data-act="mic" data-target="rpAllergies">🎙️</button></div>
+            <label class="label">🏥 Existing Conditions</label>
+            <div class="mic-row"><textarea id="rpConditions" class="input" rows="2" placeholder="e.g. Diabetes (2021), BP (2022)"></textarea><button type="button" class="mic" data-act="mic" data-target="rpConditions">🎙️</button></div>
+            <label class="label">🔪 Previous Surgeries</label>
+            <div class="mic-row"><textarea id="rpSurgeries" class="input" rows="2" placeholder="Surgery | Year | Hospital | Doctor (one per line)"></textarea><button type="button" class="mic" data-act="mic" data-target="rpSurgeries">🎙️</button></div>
+            <label class="label">🚗 Accidents?</label>
+            <div class="mic-row"><textarea id="rpAccidents" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="rpAccidents">🎙️</button></div>
+            <label class="label">👨‍👩‍👦 Family History</label>
+            <div class="mic-row"><textarea id="rpFamily" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="rpFamily">🎙️</button></div>
+            <div class="row2">
+              <div><label class="label">Annual Income (₹)</label><input id="rpIncome" type="number" class="input"></div>
+              <div><label class="label">Language</label><select id="rpLang" class="input"><option>English</option><option>Hindi</option></select></div>
+            </div>
+<label class="label">Email *</label><input id="rpEmail" type="email" class="input">
+            <label class="label">Password *</label><input id="rpPass" type="password" class="input" placeholder="min 6 characters">
+            <button type="button" class="btn ghost sm" data-act="demo-fill">✨ Try Demo (fill sample data)</button>
+            <button class="btn primary big" type="submit">Create Health ID 🆔</button>
+          </div>
+          <div id="regDoctor" class="hidden">
+            <label class="label">Doctor Name *</label>
+            <div class="mic-row"><input id="rdName" class="input"><button type="button" class="mic" data-act="mic" data-target="rdName">🎙️</button></div>
+            <div class="row2">
+              <div><label class="label">Specialization *</label><input id="rdSpec" class="input" placeholder="e.g. General Surgery"></div>
+              <div><label class="label">Experience (years)</label><input id="rdExp" type="number" class="input"></div>
+            </div>
+            <label class="label">Hospital *</label><input id="rdHospital" class="input">
+            <div class="row2">
+              <div><label class="label">Medical Reg No *</label><input id="rdReg" class="input"></div>
+              <div><label class="label">Phone</label><input id="rdPhone" class="input"></div>
+            </div>
+            <label class="label">Email *</label><input id="rdEmail" type="email" class="input">
+            <label class="label">Password *</label><input id="rdPass" type="password" class="input" placeholder="min 6 characters">
+            <button class="btn primary big" type="submit">Register as Doctor</button>
+          </div>
+          <div id="regHospital" class="hidden">
+            <label class="label">Hospital Name *</label><input id="rhName" class="input">
+            <div class="row2">
+              <div><label class="label">Admin Name *</label><input id="rhAdmin" class="input"></div>
+              <div><label class="label">Phone</label><input id="rhPhone" class="input"></div>
+            </div>
+            <label class="label">Address</label><textarea id="rhAddress" class="input" rows="2"></textarea>
+            <label class="label">License No</label><input id="rhLicense" class="input">
+            <label class="label">Email *</label><input id="rhEmail" type="email" class="input">
+            <label class="label">Password *</label><input id="rhPass" type="password" class="input" placeholder="min 6 characters">
+            <button class="btn primary big" type="submit">Register Hospital</button>
+          </div>
+        </form>
+        <p class="auth-alt">Already have an account? <a data-act="show-login">Login</a></p>
+      </div>
+        </div>
+      </div>
+      
+      <div class="demo-section-minimal">
+        <details class="demo-details" open>
+          <summary>⚡ Instant Demo Accounts</summary>
+          <div class="demo-content">
+            <div class="demo-row-minimal" style="">
+              <button class="demo-link-minimal" data-act="demo-login" data-role="patient">👤 Patient</button>
+              <button class="demo-link-minimal" data-act="demo-login" data-role="doctor">🩺 Doctor</button>
+              <button class="demo-link-minimal" data-act="demo-login" data-role="hospital">🏥 Hospital Admin</button>
+            </div>
+            <p class="hint center">Tap any role above to enter instantly — no password required!</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="auth-foot-minimal">
+        <div class="foot-brand">MHD Hospital &bull; My Health Defense Hospital 24×7</div>
+        <div class="foot-links">
+          <a data-act="foot-link">Privacy Policy</a> &middot; 
+          <a data-act="foot-link">Terms &amp; Conditions</a> &middot; 
+          <a data-act="foot-link">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APP SHELL ================= -->
+<div id="app" class="app hidden">
+  <aside id="sidebar">
+    <div class="side-brand"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#2563A6" stroke-width="2" style="margin-right:6px; vertical-align:middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> <b>MHD HOSPITAL</b><small id="sideRole">Patient Portal</small><small class="brand-sub">My Health Defense Hospital 24×7</small></div>
+    <nav id="sideNav"></nav>
+    <div class="side-user">
+      <div class="avatar" id="sideAvatar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+      <div><b id="sideName">—</b><small id="sideSub">—</small></div>
+      <button class="icon-btn" data-act="logout" title="Logout">⏻</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn burger" data-act="burger"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+      <button class="icon-btn" data-act="nav-back" title="Back"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+      <button class="icon-btn" data-act="nav-home" title="Home"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></button>
+      <h2 id="pageTitle">Dashboard</h2>
+      <div class="top-actions">
+        <input id="topSearch" class="input search hidden" placeholder="🔍 Search…">
+        <select id="langSel" class="theme-select hidden" title="Language"></select>
+        <select id="themeSel" class="theme-select hidden" title="Theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <button class="icon-btn bell" data-act="bell"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><span id="bellDot" class="dot hidden"></span></button>
+        <div class="profile-wrapper">
+          <button class="icon-btn" data-act="profile-quick" id="profBtn" title="My Profile"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></button>
+          <div id="profDrop" class="profile-drop hidden">
+            <div class="pd-header">
+              <div class="pd-av" id="pdAv"></div>
+              <div class="pd-info">
+                <div class="pd-name" id="pdName">Name</div>
+                <div class="pd-id" id="pdId">ID</div>
+              </div>
+            </div>
+            <div class="pd-div"></div>
+            <a class="pd-item" data-act="pd-profile">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile
+            </a>
+            <a class="pd-item" data-act="pd-settings">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
+            </a>
+            
+            <div class="pd-item pd-sub" data-act="pd-lang">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Language <span>&rarr; English</span>
+            </div>
+            <div class="pd-sub-menu" id="pdLangMenu">
+              <div class="pd-sub-title">Select Language</div>
+              <a class="pd-item" data-lang-val="en">English</a>
+              <a class="pd-item" data-lang-val="hi">Hindi</a>
+              <a class="pd-item" data-lang-val="te">Telugu</a>
+            </div>
+
+            <div class="pd-item pd-sub" data-act="pd-theme">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Theme <span>&rarr; System</span>
+            </div>
+            <div class="pd-sub-menu" id="pdThemeMenu">
+              <div class="pd-sub-title">Select Theme</div>
+              <a class="pd-item" data-theme-val="light">Light</a>
+              <a class="pd-item" data-theme-val="dark">Dark</a>
+              <a class="pd-item" data-theme-val="system">System</a>
+            </div>
+            <div class="pd-div"></div>
+            <a class="pd-item danger" data-act="logout">
+              <svg viewBox="0 0 24 24" style="stroke: #C0392B"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+      <div id="bellDrop" class="bell-drop hidden"></div>
+    </header>
+
+    <div class="pages">
+
+      <!-- PATIENT DASHBOARD -->
+      <section id="pg-p-dash" class="page">
+        <!-- PATIENT HEADER -->
+        <div class="dash-greet-panel">
+          <div class="dash-greet-left">
+            <h3 id="dGreet" class="dash-greet-title">Good Morning 👋</h3>
+            <p class="dash-greet-sub">Take care and get well soon. &bull; Health ID: <b id="dHid" class="dash-hid">MHD-XXXXXX</b></p>
+          </div>
+          <div class="dash-greet-right">
+            <button class="dash-btn-emergency" data-act="emergency">🚑 EMERGENCY</button>
+          </div>
+        </div>
+
+        <div id="reviewBanner" class="dash-banner hidden"></div>
+
+        <!-- ROW 1: Health Status & Next Appointment -->
+        <div class="dash-grid-2 ultra-compact-row">
+          <div class="dash-panel ultra-compact-panel">
+            <div class="uc-top">
+              <div class="uc-title">HEALTH STATUS</div>
+              <div class="uc-value" id="recoRing"></div>
+            </div>
+            <div class="uc-mid">
+              <div class="uc-bar"><div class="uc-bar-fill" id="recoBarFill"></div></div>
+            </div>
+            <div class="uc-bottom">
+              <div id="recoMsg" class="uc-msg"></div>
+              <a class="uc-link" data-nav="p-vitals" style="white-space: nowrap">View &rarr;</a>
+            </div>
+          </div>
+          
+          <div class="dash-panel ultra-compact-panel">
+            <div class="uc-top">
+              <div class="uc-title">NEXT APPOINTMENT</div>
+              <a class="uc-link" data-nav="p-appts" style="white-space: nowrap">View &rarr;</a>
+            </div>
+            <div class="uc-mid-appt" id="nextApptCard">
+              No upcoming appointments.
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: Summary Metrics (miniStats) -->
+        <div class="dash-panel dash-metrics-panel">
+          <div id="miniStats" class="dash-metrics-grid"></div>
+        </div>
+
+        <!-- ROW 3: Today's Medication Schedule -->
+        <div class="dash-panel dash-table-panel">
+          <div class="dash-panel-header flex-header">
+            <span>TODAY'S MEDICATIONS</span>
+            <a class="dash-link" data-nav="p-meds">View all &rarr;</a>
+          </div>
+          <div class="dash-table-wrapper">
+            <div class="dash-table-header">
+              <div class="th-time">TIME</div>
+              <div class="th-med">ITEM</div>
+              <div class="th-inst">INSTRUCTIONS</div>
+              <div class="th-status">STATUS</div>
+              <div class="th-action">ACTION</div>
+            </div>
+            <div id="todaySchedule" class="dash-schedule-list"></div>
+          </div>
+        </div>
+
+        <!-- ROW 4: Follow-up -->
+        <div id="followBanner" class="dash-banner dash-banner-amber hidden"></div>
+
+        <!-- ROW 5: Quick Actions -->
+        <div class="dash-panel dash-quick-panel">
+          <div class="dash-panel-header">QUICK ACTIONS</div>
+          <div class="dash-quick-grid">
+            <button class="dash-qbtn" data-nav="p-appts"><span class="qbtn-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span><span class="qbtn-text">Book Appointment</span></button>
+            <button class="dash-qbtn" data-nav="p-doctors"><span class="qbtn-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span><span class="qbtn-text">Talk to Doctor</span></button>
+            <button class="dash-qbtn" data-nav="p-results"><span class="qbtn-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"></path></svg></span><span class="qbtn-text">My Results</span></button>
+            <button class="dash-qbtn" data-nav="p-vitals"><span class="qbtn-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span><span class="qbtn-text">Health Overview</span></button>
+            <button class="dash-qbtn" data-nav="p-case"><span class="qbtn-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span><span class="qbtn-text">New / My Case</span></button>
+            <button class="dash-qbtn" data-nav="p-qr"><span class="qbtn-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></span><span class="qbtn-text">My QR</span></button>
+          </div>
+        </div>
+
+        <!-- LOWER DASHBOARD -->
+        <div class="dash-grid-4">
+          <div class="dash-panel">
+            <div class="dash-panel-header">CARE STATUS</div>
+            <div id="careBars" class="dash-care-bars"></div>
+          </div>
+          <div class="dash-panel">
+            <div class="dash-panel-header">ACTIVE MEDICINES</div>
+            <ul id="medMini" class="dash-list"></ul>
+            <a class="dash-link block-link" data-nav="p-meds">All Medicines &rarr;</a>
+          </div>
+          <div class="dash-panel">
+            <div class="dash-panel-header">RECENT RESULTS</div>
+            <ul id="repMini" class="dash-list"></ul>
+            <a class="dash-link block-link" data-nav="p-results">All Results &rarr;</a>
+          </div>
+          <div class="dash-panel">
+            <div class="dash-panel-header">BILLING</div>
+            <div id="billMini" class="dash-kv-list">No bills yet.</div>
+            <a class="dash-link block-link" data-nav="p-billing">Billing History &rarr;</a>
+          </div>
+        </div>
+
+        <div id="searchResults" class="dash-panel hidden" style="margin-top:24px;">
+          <div class="dash-panel-header">SEARCH RESULTS</div>
+          <div id="searchResultsBody"></div>
+        </div>
+      </section>
+
+      <!-- PATIENT UPCOMING -->
+      <section id="pg-p-upcoming" class="page hidden">
+        <div class="up-container">
+          <!-- Page Header -->
+          <div class="up-header-area">
+            <h1 class="up-title">Upcoming</h1>
+            <p class="up-subtitle">Appointments, follow-ups, and medication reminders</p>
+          </div>
+
+          <!-- 1. Upcoming Appointments -->
+          <div class="up-section">
+            <div class="up-section-header">
+              <div class="up-section-title-group">
+                <svg class="up-section-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h2 class="up-section-title">Upcoming appointments</h2>
+              </div>
+              <button type="button" class="up-link-btn" data-nav="p-appts">View appointment history &rarr;</button>
+            </div>
+            <div id="upAppts" class="up-card-content"></div>
+          </div>
+
+          <!-- 2. Follow-up Reminders -->
+          <div class="up-section">
+            <div class="up-section-header">
+              <div class="up-section-title-group">
+                <svg class="up-section-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <div>
+                  <h2 class="up-section-title">Follow-up reminders</h2>
+                  <p class="up-section-subtitle">Stay on track with your care plan</p>
+                </div>
+              </div>
+            </div>
+            <div id="upFollow" class="up-card-content"></div>
+          </div>
+
+          <!-- 3. Active Medications -->
+          <div class="up-section">
+            <div class="up-section-header">
+              <div class="up-section-title-group">
+                <svg class="up-section-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.5 20.5a5 5 0 1 1-7.07-7.07l9.19-9.19a5 5 0 1 1 7.07 7.07z"></path>
+                  <line x1="8.54" y1="11.46" x2="15.61" y2="18.54"></line>
+                </svg>
+                <h2 class="up-section-title">Active medications</h2>
+              </div>
+              <button type="button" class="up-link-btn" data-nav="p-meds">All medications &rarr;</button>
+            </div>
+            <div id="upMeds" class="up-card-content"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PATIENT MY CASE -->
+      <section id="pg-p-case" class="page hidden">
+        <h3>📋 My Case — History &amp; New Case</h3>
+        <div id="myCaseStatus"></div>
+        <div class="card">
+          <h4>📝 New Case <span id="draftNote" class="chip blue"></span></h4>
+          <p class="muted">Your answers auto-save as a draft while you type, then go to the doctor when you submit.</p>
+          <label class="label">1️⃣ Chief Complaint — "What brings you here?" *</label>
+          <div class="mic-row"><textarea id="ncComplaint" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncComplaint">🎙️</button></div>
+          <label class="label">2️⃣ Symptoms</label>
+          <div class="mic-row"><textarea id="ncSymptoms" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncSymptoms">🎙️</button></div>
+          <label class="label">🧍 Symptom Area</label>
+          <div id="ncAreas" class="chips">
+            <button type="button" class="chip" data-area="Head">🧠 Head</button>
+            <button type="button" class="chip" data-area="Chest">🫁 Chest</button>
+            <button type="button" class="chip" data-area="Abdomen">🍽️ Abdomen</button>
+            <button type="button" class="chip" data-area="Limbs/Joints">🦵 Limbs / Joints</button>
+            <button type="button" class="chip" data-area="Skin">🩹 Skin</button>
+            <button type="button" class="chip" data-area="General">🌡️ General</button>
+          </div>
+          <div class="row2">
+            <div><label class="label">3️⃣ Since when?</label><input id="ncDuration" class="input" placeholder="e.g. 3 days"></div>
+            <div><label class="label">Severity</label><select id="ncSeverity" class="input"><option>Mild</option><option>Moderate</option><option>Severe</option></select></div>
+          </div>
+          <label class="label">4️⃣ Previous treatment taken</label>
+          <div class="mic-row"><textarea id="ncPrevTx" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncPrevTx">🎙️</button></div>
+          <label class="label">5️⃣ Existing conditions</label>
+          <div class="mic-row"><textarea id="ncExisting" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncExisting">🎙️</button></div>
+          <label class="label">6️⃣ Current medicines</label>
+          <div class="mic-row"><textarea id="ncMeds" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncMeds">🎙️</button></div>
+          <label class="label">7️⃣ Allergies</label>
+          <div class="mic-row"><textarea id="ncAllergy" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncAllergy">🎙️</button></div>
+          <label class="label">8️⃣ Previous surgery</label>
+          <div class="mic-row"><textarea id="ncSurgery" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncSurgery">🎙️</button></div>
+          <label class="label">9️⃣ Family history</label>
+          <div class="mic-row"><textarea id="ncFamily" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncFamily">🎙️</button></div>
+          <label class="label">🔟 Other information / Questions</label>
+          <div class="mic-row"><textarea id="ncOther" class="input" rows="2"></textarea><button type="button" class="mic" data-act="mic" data-target="ncOther">🎙️</button></div>
+          <button class="btn primary big" data-act="submit-case">SUBMIT CASE TO DOCTOR ➜</button>
+        </div>
+        <div class="card"><h4>📚 All My Cases</h4><div id="caseHistory" class="list"></div></div>
+        <div class="grid2">
+          <div class="card"><h4>👤 Personal Details</h4><div id="secPersonal" class="kv"></div><span class="chip blue">🟦 Patient reported</span></div>
+          <div class="card"><h4>🩺 Medical History</h4><div id="secMedical" class="kv"></div><span class="chip blue">🟦 Patient reported</span></div>
+          <div class="card"><h4>⚠️ Allergy History</h4><div id="secAllergy" class="kv"></div></div>
+          <div class="card"><h4>🔪 Surgery History</h4><div id="secSurgery" class="kv"></div></div>
+          <div class="card"><h4>💊 Medication History</h4><ul id="secMeds" class="mini-list"></ul></div>
+          <div class="card"><h4>🏥 Previous Hospital Visits</h4><ul id="secVisits" class="mini-list"></ul></div>
+        </div>
+      </section>
+
+      <!-- PATIENT MEDICINES (self-add restored) -->
+      <section id="pg-p-meds" class="page hidden">
+        <h3>💊 My Medicines</h3>
+        <div class="card">
+          <h4>Add a medicine you take <span class="chip blue">🟦 unverified until a doctor confirms it</span></h4>
+          <div class="row4">
+            <input id="mName" class="input" placeholder="Medicine name">
+            <input id="mDose" class="input" placeholder="Dosage / instructions">
+            <input id="mStart" type="date" class="input">
+            <input id="mDur" type="number" class="input" placeholder="Days">
+          </div>
+          <button class="btn primary" data-act="add-med">+ Add Medicine</button>
+          <p class="hint">Your doctor verifies this → it turns 🟩 <b>Ready to take ✓</b> on your portal.</p>
+        </div>
+        <div id="medList" class="list"></div>
+      </section>
+
+      <!-- PATIENT RESULTS (view-only) -->
+      <section id="pg-p-results" class="page hidden">
+        <h3>🧪 My Results</h3>
+        <p class="muted">All your test results and reports — entered by your doctor and hospital. Tap any result to see it in full detail.</p>
+        <div class="card"><h4>📊 Results Summary</h4><div id="resSummary" class="kv"></div></div>
+        <div id="repList" class="list"></div>
+      </section>
+
+      <!-- PATIENT APPOINTMENTS -->
+      <section id="pg-p-appts" class="page hidden">
+        <h3>📅 Appointments</h3>
+        <div class="card">
+          <h4>Book Appointment <span class="chip green">🛡️ Double-booking protected</span></h4>
+          <div class="row3">
+            <select id="apDoctor" class="input"></select>
+            <input id="apDate" type="date" class="input">
+            <select id="apType" class="input"><option>Follow-up Checkup</option><option>Video Consultation</option><option>In-person Visit</option><option>🚨 Emergency (Triage priority)</option></select>
+          </div>
+          <label class="label">Available Time <small class="muted">(booked slots crossed out)</small></label>
+          <div id="apSlots" class="chips"></div>
+          <label class="label">Reason for visit</label>
+          <textarea id="apReason" class="input" rows="2"></textarea>
+          <button class="btn primary" data-act="book-appt">Confirm Appointment</button>
+          <p class="hint">🛡️ ACID transaction locking. Your booking gets a 🎟️ Queue number on the dashboard, in your QR, and on the doctor's screen.</p>
+        </div>
+        <div class="tabs sm">
+          <button class="tab active" data-aptab="upcoming">Upcoming</button>
+          <button class="tab" data-aptab="completed">Completed</button>
+          <button class="tab" data-aptab="cancelled">Cancelled</button>
+        </div>
+        <div id="apList" class="list"></div>
+      </section>
+<!-- PATIENT DOCTORS + MAP -->
+      <section id="pg-p-doctors" class="page hidden">
+        <h3>👨‍⚕️ My Doctors</h3>
+        <p class="muted">Message, call or locate your doctor — 🟢 = on duty with live location.</p>
+        <div id="docList" class="doc-grid"></div>
+        <div class="card" style="margin-top:14px">
+          <h4>🗺️ Doctor Live Location</h4>
+          <p class="muted sm-txt">Doctors appear only while <b>ON DUTY</b>. Location is deleted on logout; older than 6 minutes = hidden.</p>
+          <div id="mapDocs" class="chips"></div>
+          <div id="docMap"></div>
+          <div id="mapInfo" class="muted sm-txt" style="margin-top:8px"></div>
+        </div>
+      </section>
+
+      <!-- PATIENT TIMELINE -->
+      <section id="pg-p-timeline" class="page hidden">
+        <h3>🕐 My Medical Journey</h3>
+        <div id="tlList" class="timeline"></div>
+      </section>
+
+      <!-- PATIENT HEALTH OVERVIEW (doctor-entered) -->
+      <section id="pg-p-vitals" class="page hidden">
+        <div class="greet">
+          <div><h3>🩺 My Health Overview</h3><p class="muted">Entered by your doctor — view only</p></div>
+          <span class="chip blue" id="vtToday"></span>
+        </div>
+        <div class="card overview-card">
+          <p class="muted sm-txt" id="ovUpdated">No health data yet — your doctor will add it here.</p>
+          <div id="ovRows" class="ov-rows"></div>
+        </div>
+        <div class="card"><h4>Recent Records <small class="muted">(entered by doctors)</small></h4><div id="recentVitals" class="list"></div></div>
+        <div class="card"><h4>Trends (Last 7 Records)</h4><div id="trendGrid" class="trend-grid"></div></div>
+      </section>
+
+      <!-- PATIENT QR -->
+      <section id="pg-p-qr" class="page hidden">
+        <h3>📱 My QR Medical ID</h3>
+        <div class="grid2">
+          <div class="card center">
+            <div id="qrBox" class="qr-box"></div>
+            <p><b id="qrHid">MHD-XXXXXX</b></p>
+            <p class="muted" id="qrName"></p>
+          </div>
+          <div class="card">
+            <h4>What's inside this QR?</h4>
+            <div id="qrContents" class="kv muted"></div>
+            <button class="btn danger big" data-act="emergency" style="margin-top:10px">🚑 Open Emergency Mode</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PATIENT PRIVACY -->
+      <section id="pg-p-privacy" class="page hidden">
+        <h3>🔒 Privacy &amp; Access</h3>
+        <div class="card"><h4>🔐 Consent Center</h4><p class="muted">"Who can see my medical record?" — you decide.</p><div id="consentList" class="list"></div></div>
+        <div class="card"><h4>👁️ Access History — who viewed my record?</h4><div id="accessList" class="list"></div></div>
+      </section>
+
+      <!-- PATIENT BILLING -->
+      <section id="pg-p-billing" class="page hidden">
+        <h3>💰 Billing &amp; Budget History</h3>
+        <div class="grid3" id="pbSummary"></div>
+        <div class="card"><h4>All Bills</h4><div id="pbList" class="list"></div></div>
+      </section>
+
+      <!-- NOTIFICATIONS (two columns) -->
+      <section id="pg-notifs" class="page hidden">
+        <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg> Notification Center</h3>
+        <div class="grid2">
+          <div class="card"><h4>🆕 New Notifications</h4><div id="notifNew" class="list"></div></div>
+          <div class="card"><h4>✅ Read Notifications</h4><div id="notifRead" class="list"></div></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="pg-settings" class="page hidden">
+        <h3>⚙️ Profile &amp; Settings</h3>
+        <div class="grid2">
+          <div class="card">
+            <h4>🖼️ My Photo &amp; Identity</h4>
+            <div class="photo-row" id="photoBlock"></div>
+            <div id="settingsProfile"></div>
+          </div>
+          <div class="card">
+            <h4>🎨 Appearance &amp; Accessibility</h4>
+            <label class="label">Language</label>
+            <select id="setLang" class="input"></select>
+            <label class="label">Theme</label>
+            <select id="themeSelSet" class="input"><option value="light">Light</option><option value="dark">Dark</option></select>
+            <label class="label">Text size</label>
+            <div class="chips">
+              <button class="chip" data-act="font" data-v="sm">A−</button>
+              <button class="chip" data-act="font" data-v="md">A</button>
+              <button class="chip" data-act="font" data-v="lg">A+</button>
+            </div>
+            <p class="hint">Photos are auto-compressed before saving. Fixed IDs (Health ID / Aadhaar / Reg No) need hospital admin help.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOCTOR DASHBOARD -->
+      <section id="pg-d-dash" class="page hidden">
+        <div class="card welcome-strip" id="docWelcome"></div>
+        <div class="grid5mini" id="ddStats"></div>
+        <div class="card" id="dutyCard"></div>
+        <div class="grid2" style="margin-top:14px">
+          <div class="card"><h4>🟡 Your Patients Waiting for Review <small class="muted">(click a name → their full portal)</small></h4><div id="ddPending" class="list"></div></div>
+          <div class="card"><h4>📅 Your Schedule Today — Time &amp; Queue 🎟️</h4><div id="ddToday" class="list"></div></div>
+        </div>
+        <div class="card verify-cta" id="verifyCta"></div>
+      </section>
+
+      <!-- DOCTOR HEALTH INPUT -->
+      <section id="pg-d-vitals" class="page hidden">
+        <h3>🩺 Patient Health Input</h3>
+        <p class="muted">Only doctors can enter health data. What you save here appears instantly on the patient's portal.</p>
+        <div class="card">
+          <h4>Patient Details</h4>
+          <label class="label">Select Patient</label>
+          <select id="dvPatient" class="input"></select>
+          <div id="dvDetails" class="kv" style="margin-top:8px"></div>
+          <label class="label">Date</label>
+          <input id="dvDate" type="date" class="input">
+          <h4 style="margin-top:14px">Health Data</h4>
+          <div class="row2">
+            <div><label class="label">Blood Pressure (mmHg)</label><input id="dvBp" class="input" placeholder="e.g. 120/80"></div>
+            <div><label class="label">Temperature (°F)</label><input id="dvTemp" class="input" type="number" step="0.1" placeholder="e.g. 98.6"></div>
+          </div>
+          <div class="row2">
+            <div><label class="label">Heart Rate (bpm)</label><input id="dvHr" class="input" type="number" placeholder="e.g. 72"></div>
+            <div><label class="label">Weight (kg)</label><input id="dvWt" class="input" type="number" step="0.1" placeholder="e.g. 70"></div>
+          </div>
+          <label class="label">Symptoms</label>
+          <div class="mic-row"><textarea id="dvSym" class="input" rows="2" placeholder="e.g. Mild pain in lower back."></textarea><button type="button" class="mic" data-act="mic" data-target="dvSym">🎙️</button></div>
+          <button class="btn primary big" data-act="save-vitals">💾 Save</button>
+          <p class="hint">🔒 Secure • Accurate • Real-time — the patient sees this record the moment you save.</p>
+        </div>
+        <div class="card"><h4>Recent Entries (selected patient)</h4><div id="dvRecent" class="list"></div></div>
+      </section>
+
+      <!-- DOCTOR CASES -->
+      <section id="pg-d-cases" class="page hidden">
+        <h3>📋 Cases</h3>
+        <div class="tabs sm">
+          <button class="tab active" data-ctab="waiting">🟡 Waiting</button>
+          <button class="tab" data-ctab="reviewed">🟩 Reviewed by me</button>
+        </div>
+        <div id="dcList" class="list"></div>
+      </section>
+<!-- DOCTOR VERIFICATION -->
+      <section id="pg-d-verify" class="page hidden">
+        <h3>💊 Medicine Verification Center</h3>
+        <p class="muted">Patient-reported medicines (🟦) become 🟩 <b>Verified — Ready to take ✓</b> only after your confirmation. The patient's portal updates instantly.</p>
+        <div id="dvList" class="list"></div>
+      </section>
+
+      <!-- DOCTOR MESSAGES -->
+      <section id="pg-d-chats" class="page hidden">
+        <h3>💬 Messages</h3>
+        <div id="dChatList" class="list"></div>
+      </section>
+
+      <!-- DOCTOR EARNINGS -->
+      <section id="pg-d-billing" class="page hidden">
+        <h3>💰 My Earnings</h3>
+        <div class="grid3" id="dbSummary"></div>
+        <div class="card"><h4>Bills created by me</h4><div id="dbList" class="list"></div></div>
+      </section>
+
+      <!-- DOCTOR CASE DETAIL -->
+      <section id="pg-d-case" class="page hidden">
+        <button class="btn ghost sm" data-nav="d-cases">← Back</button>
+        <div id="cdHead"></div>
+        <div class="card ai"><h4>🧠 AI Case Snapshot <span class="chip amber">auto-generated from records</span></h4><div id="cdSummary" class="kv"></div></div>
+        <div class="card"><h4>📎 Patient Test Results &amp; Documents <small class="muted">(tap to view in full detail)</small></h4><div id="cdDocs" class="doc-thumbs"></div></div>
+        <div class="grid2">
+          <div class="card blue-edge"><h4>🟦 Patient-Reported</h4><div id="cdBlue" class="kv"></div></div>
+          <div class="card green-edge">
+            <h4>🟩 Doctor-Verified (your entry)</h4>
+            <label class="label">Clinical Notes</label>
+            <div class="mic-row"><textarea id="cdNotes" class="input" rows="3"></textarea><button type="button" class="mic" data-act="mic" data-target="cdNotes">🎙️</button></div>
+            <label class="label">Observations / Confirmed Information</label>
+            <textarea id="cdObs" class="input" rows="2"></textarea>
+            <label class="label">Prescription (medicines)</label>
+            <div id="prescRows"></div>
+            <button class="btn ghost sm" data-act="add-presc-row">+ Add Medicine</button>
+            <label class="label">Recommended Tests</label>
+            <textarea id="cdTests" class="input" rows="2" placeholder="e.g. CBC, HbA1c"></textarea>
+            <label class="label">Consultation Fee (₹)</label>
+            <input id="cdFee" type="number" class="input sm-input" placeholder="e.g. 300">
+            <label class="label">Follow-up after (days)</label>
+            <input id="cdFollow" type="number" class="input sm-input" placeholder="e.g. 14">
+            <label class="chip green"><input type="checkbox" id="cdShare" checked> Share with patient</label>
+            <button class="btn primary big" data-act="submit-review">✅ VERIFY &amp; SEND TO PATIENT</button>
+          </div>
+        </div>
+        <div class="card"><h4>💊 Patient's Medicines — Verify</h4><div id="cdMedVerify" class="list"></div></div>
+      </section>
+
+      <!-- DOCTOR PATIENTS / APPOINTMENTS -->
+      <section id="pg-d-patients" class="page hidden">
+        <h3>🔍 Patients</h3>
+        <input id="dpSearch" class="input" placeholder="Search by Health ID or name…">
+        <div id="dpList" class="doc-grid"></div>
+      </section>
+
+      <section id="pg-d-appts" class="page hidden">
+        <h3>📅 My Appointments</h3>
+        <div id="daList" class="list"></div>
+      </section>
+
+      <!-- HOSPITAL DASHBOARD -->
+      <section id="pg-h-dash" class="page hidden">
+        <h3>🏥 Hospital Dashboard</h3>
+        <div class="grid3" id="hhStats"></div>
+        <div class="card"><h4>🧾 Today's Patient Queue</h4><div id="hhQueue"></div></div>
+      </section>
+
+      <section id="pg-h-patients" class="page hidden">
+        <h3>👥 All Patients — Full Records</h3>
+        <input id="hPatSearch" class="input" placeholder="Search patient by name or Health ID…">
+        <div id="hPatList" class="list"></div>
+      </section>
+<section id="pg-h-doctors" class="page hidden">
+        <h3>👨‍⚕️ All Doctors — Full Records</h3>
+        <div id="hDocTable"></div>
+      </section>
+
+      <section id="pg-h-cases" class="page hidden">
+        <h3>📋 All Cases</h3>
+        <div id="hCaseTable"></div>
+      </section>
+
+      <section id="pg-h-meds" class="page hidden">
+        <h3>💊 Medicines Overview — Verification Status</h3>
+        <div id="hMedTable"></div>
+      </section>
+
+      <section id="pg-h-docs" class="page hidden">
+        <h3>📄 Patient Documents — Verify</h3>
+        <p class="muted">Verify patient documents to mark 🟩 trusted — verified results appear on the patient's Results page and in the doctor's snapshot.</p>
+        <div id="hDocList" class="list"></div>
+      </section>
+
+      <!-- HOSPITAL APPOINTMENTS DATE-WISE -->
+      <section id="pg-h-appts" class="page hidden">
+        <h3>📅 All Appointments — Organized by Date</h3>
+        <div class="grid3" id="hApptSummary" style="margin-bottom:12px"></div>
+        <div id="hApptGroups"></div>
+      </section>
+
+      <section id="pg-h-billing" class="page hidden">
+        <h3>💰 Hospital Billing</h3>
+        <div class="card">
+          <h4>Add a bill for a patient (real-time → appears in patient &amp; doctor portals instantly)</h4>
+          <div class="row3">
+            <input id="hbHid" class="input" placeholder="Patient Health ID (MHD-XXXXXX)">
+            <input id="hbItem" class="input" placeholder="Item e.g. CBC blood test">
+            <input id="hbAmount" type="number" class="input" placeholder="Amount ₹">
+          </div>
+          <div class="row3">
+            <select id="hbType" class="input"><option>medicine</option><option>test</option><option>procedure</option><option>room</option><option>other</option></select>
+            <input id="hbDate" type="date" class="input">
+            <button class="btn primary" data-act="h-add-bill">+ Add Bill</button>
+          </div>
+        </div>
+        <div class="grid3" id="hbSummary"></div>
+        <div class="card"><h4>All Bills (real-time)</h4><div id="hbList"></div></div>
+      </section>
+
+      <!-- HOSPITAL UPLOAD REPORT -->
+      <section id="pg-h-upload" class="page hidden">
+        <h3>🧪 Upload Result for Patient</h3>
+        <p class="muted">Uploaded results appear instantly on the patient's <b>Results</b> page and can include a photo of the physical document.</p>
+        <div class="card">
+          <label class="label">Select Patient *</label><select id="huHid" class="input"></select>
+          <div class="row3">
+            <input id="huTitle" class="input" placeholder="Result title e.g. CBC Blood Test">
+            <select id="huType" class="input"><option>Lab Report</option><option>X-ray</option><option>CT / MRI</option><option>Scan</option><option>Prescription</option><option>Discharge Summary</option><option>Other Document</option></select>
+            <input id="huDate" type="date" class="input">
+          </div>
+          <div class="row3">
+            <select id="huDoctor" class="input"></select>
+            <input id="huNote" class="input" placeholder="Note / summary of the result">
+            <span></span>
+          </div>
+          <label class="label">📷 Attach photo of the physical document (optional)</label>
+          <input type="file" id="huFile" accept="image/*" class="input">
+          <div id="huPreview" class="hidden" style="margin-top:8px"><img id="huPreviewImg" class="doc-view-img" alt=""></div>
+          <button class="btn primary big" data-act="h-upload" style="margin-top:10px">Upload Result (Verified ✓)</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<button id="cbFab" class="fab hidden" data-act="chatbot" title="Ask MHD Assistant">🤖</button>
+
+<div id="emOverlay" class="overlay hidden">
+  <div class="em-card">
+    <div class="em-head"><b>🚑 EMERGENCY MODE — MHD HOSPITAL</b><button class="icon-btn" data-act="close-em">✕</button></div>
+    <p class="muted">Minimal information. Maximum usefulness. Only consent-compliant critical data is shown.</p>
+    <div id="emBody" class="grid2"></div>
+    <div id="emLookupRow" class="hidden">
+      <input id="emHealthId" class="input" placeholder="Enter Patient Health ID (MHD-XXXXXX)">
+      <button class="btn primary" data-act="em-lookup">Lookup</button>
+    </div>
+  </div>
+</div>
+
+<div id="chatModal" class="overlay hidden">
+  <div class="chat-card">
+    <div class="em-head chat-head"><b id="chatTitle">Chat</b><button class="icon-btn" data-act="close-chat">✕</button></div>
+    <div id="chatMsgs" class="chat-msgs"></div>
+    <div class="chat-input-row">
+      <input id="chatInput" class="input" placeholder="Type your message…">
+      <button class="btn primary" data-act="send-chat">➤</button>
+    </div>
+    <p class="hint center">🔒 Your conversations are secure and confidential.</p>
+  </div>
+</div>
+
+<div id="cbModal" class="overlay hidden">
+  <div class="chat-card">
+    <div class="em-head chat-head"><b>Ask MHD Assistant</b><button class="icon-btn" data-act="close-cb">✕</button></div>
+    <div id="cbMsgs" class="chat-msgs"><div class="msg bot">Hello! I can answer <b>66+ common questions</b> about your records — try "book appointment", "queue number", "my BP", "how to scan a document?"…</div></div>
+    <div class="chat-input-row">
+      <input id="cbInput" class="input" placeholder="Ask me anything about the hospital…">
+      <button class="btn primary" data-act="send-cb">➤</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalRoot" class="overlay hidden"><div class="chat-card" id="modalCard"></div></div>
+<div id="toastRoot" class="toast-root"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
