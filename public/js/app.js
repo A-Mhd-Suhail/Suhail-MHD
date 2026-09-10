@@ -324,20 +324,31 @@ const DEMO = {
 };
 async function quickDemo(role) {
   const d = DEMO[role]; if (!d) return;
+  toast('Opening demo ' + role + '… ⚡');
   cleanupSession();
+
+  // If already logged in as this user, enter app instantly
+  if (auth.currentUser && auth.currentUser.email === d.email) {
+    ME = { id: auth.currentUser.uid, email: d.email, ...d.profile };
+    ROLE = ME.role;
+    enterApp();
+    return;
+  }
+
   try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
-  try { await auth.signInWithEmailAndPassword(d.email, DEMO_PASS); toast('Logged in as demo ' + role + ' ✅'); }
-  catch (err) {
+  try {
+    await auth.signInWithEmailAndPassword(d.email, DEMO_PASS);
+  } catch (err) {
     const c = (err && err.code) || '';
-    if (c.includes('user-not-found') || c.includes('invalid-credential')) {
+    if (c.includes('user-not-found') || c.includes('invalid-credential') || c.includes('wrong-password')) {
       try {
         const cred = await auth.createUserWithEmailAndPassword(d.email, DEMO_PASS);
         await db.collection('users').doc(cred.user.uid).set({ ...d.profile, email: d.email, createdAt: Date.now() });
         if (role === 'patient') await db.collection('medicines').add({ patientId: cred.user.uid, name: 'Metformin 500mg', dosage: '1 tablet after breakfast', startDate: todayStr(), durationDays: '30', prescribedBy: 'Arjun Kumar (self-reported)', verified: false, source: 'patient', active: true, createdAt: Date.now() });
-        toast('Demo ' + role + ' account created & logged in ✅');
       } catch (e2) {
-        if ((e2 && e2.code || '').includes('email-already-in-use')) { try { await auth.signInWithEmailAndPassword(d.email, DEMO_PASS); toast('Logged in ✅'); } catch (e3) { toast('⚠️ ' + errMsg(e3)); } }
-        else toast('⚠️ ' + errMsg(e2));
+        if ((e2 && e2.code || '').includes('email-already-in-use')) {
+          try { await auth.signInWithEmailAndPassword(d.email, DEMO_PASS); } catch (e3) { toast('⚠️ ' + errMsg(e3)); }
+        } else toast('⚠️ ' + errMsg(e2));
       }
     } else toast('⚠️ ' + errMsg(err));
   }
@@ -377,11 +388,27 @@ async function doLogout() { cleanupSession(); await auth.signOut().catch(() => {
 auth.onAuthStateChanged(async user => {
   if (!user) { $('#screen-auth').classList.remove('hidden'); $('#app').classList.add('hidden'); showAuth('login'); return; }
   try {
+    const demoKey = Object.keys(DEMO).find(k => DEMO[k].email === user.email);
+    if (demoKey) {
+      ME = { id: user.uid, email: user.email, ...DEMO[demoKey].profile };
+      ROLE = ME.role;
+      if (ME.language && I18N[ME.language]) { CUR_LANG = ME.language; localStorage.setItem('mhd_lang', CUR_LANG); fillLangSelects(); }
+      enterApp();
+      db.collection('users').doc(user.uid).get().then(s => {
+        if (s.exists) {
+          ME = { id: user.uid, ...s.data() };
+        } else {
+          db.collection('users').doc(user.uid).set(ME, { merge: true }).catch(() => {});
+        }
+      }).catch(() => {});
+      return;
+    }
+
     let snap = null;
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
       const s = await db.collection('users').doc(user.uid).get();
       if (s.exists) { snap = s; break; }
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 200));
     }
     if (!snap) { toast('Profile missing — please register again.'); await auth.signOut(); return; }
     ME = { id: user.uid, ...snap.data() };
@@ -959,17 +986,159 @@ document.addEventListener('click', e => {
 });
 
 /* ----- UPCOMING / TIMELINE ----- */
+function formatDueDays(dueStr) {
+  if (!dueStr) return '';
+  const today = new Date(todayStr() + 'T00:00:00');
+  const due = new Date(dueStr + 'T00:00:00');
+  const diffTime = due - today;
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return 'Due today';
+  if (diffDays === 1) return 'Due in 1 day';
+  if (diffDays > 1) return `Due in ${diffDays} days`;
+  if (diffDays === -1) return 'Overdue by 1 day';
+  if (diffDays < -1) return `Overdue by ${Math.abs(diffDays)} days`;
+  return `Due ${fmtD(dueStr)}`;
+}
+
 function renderUpcoming() {
   if (ROLE !== 'patient') return;
   const ua = $('#upAppts'); if (!ua) return;
   const appts = STATE.appts.filter(a => a.status === 'upcoming' && a.date >= todayStr()).sort((a, b) => a.date.localeCompare(b.date));
-  ua.innerHTML = appts.map(a => { const q = queueNumberOf(a); return '<div class="list-item"><div class="li-main"><b>👨‍⚕️ ' + esc(a.doctorName) + (q ? ' <span class="queue-chip">🎟️ Q#' + q + '</span>' : '') + '</b><small>' + fmtD(a.date) + ' • ' + esc(a.time) + ' • ' + esc(a.hospital || '') + '</small></div><span class="chip blue">Confirmed</span></div>'; }).join('') || '<p class="muted">No upcoming appointments.</p>';
+
+  if (!appts.length) {
+    ua.innerHTML = `
+      <div class="up-empty-state">
+        <div class="up-empty-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <div class="up-empty-text">
+          <div class="up-empty-title">No upcoming appointments</div>
+          <div class="up-empty-desc">You’re all caught up. New appointments will appear here.</div>
+        </div>
+        <button type="button" class="up-empty-action" data-nav="p-appts">View appointment history &rarr;</button>
+      </div>`;
+  } else {
+    ua.innerHTML = `<div class="up-row-list">${appts.map(a => {
+      const q = queueNumberOf(a);
+      return `
+        <div class="up-row">
+          <div class="up-row-icon icon-blue">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="up-row-main">
+            <div class="up-row-title-row">
+              <span class="up-row-title">Dr. ${esc(a.doctorName)}</span>
+              ${q ? `<span class="up-chip queue">🎟️ Q#${q}</span>` : ''}
+            </div>
+            <div class="up-row-meta">
+              <span>📅 ${fmtD(a.date)}</span>
+              <span class="up-dot">•</span>
+              <span>🕒 ${esc(a.time)}</span>
+              ${a.hospital ? `<span class="up-dot">•</span><span>🏥 ${esc(a.hospital)}</span>` : ''}
+            </div>
+          </div>
+          <div class="up-row-right">
+            <span class="up-chip badge-confirmed">Confirmed</span>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
+
   const uf = $('#upFollow');
   const fus = STATE.timeline.filter(tt => tt.type === 'followup' && tt.due && tt.due >= todayStr()).sort((a, b) => a.due.localeCompare(b.due));
-  uf.innerHTML = fus.map(f => '<div class="list-item"><div class="li-main"><b>🔔 ' + esc(f.title) + '</b><small>' + esc(f.description || '') + '</small></div><span class="chip amber">Due ' + fmtD(f.due) + '</span></div>').join('') || '<p class="muted">No follow-up reminders.</p>';
+  if (!fus.length) {
+    uf.innerHTML = `
+      <div class="up-empty-state">
+        <div class="up-empty-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </div>
+        <div class="up-empty-text">
+          <div class="up-empty-title">No follow-up reminders</div>
+          <div class="up-empty-desc">You have no pending care plan follow-ups at this time.</div>
+        </div>
+      </div>`;
+  } else {
+    uf.innerHTML = `<div class="up-row-list">${fus.map(f => {
+      const dueBadge = formatDueDays(f.due);
+      return `
+        <div class="up-row">
+          <div class="up-row-icon icon-amber">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="up-row-main">
+            <div class="up-row-title">${esc(f.title)}</div>
+            <div class="up-row-meta">
+              <span>Due ${fmtD(f.due)}</span>
+              ${f.description ? `<span class="up-dot">•</span><span>${esc(f.description)}</span>` : ''}
+            </div>
+          </div>
+          <div class="up-row-right">
+            <span class="up-chip badge-due">${dueBadge}</span>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
+
   const um = $('#upMeds');
   const meds = STATE.meds.filter(m => m.active !== false);
-  um.innerHTML = meds.map(m => '<div class="list-item"><div class="li-main"><b>💊 ' + esc(m.name) + '</b><small>' + esc(m.dosage || '') + '</small></div>' + medChip(m) + '</div>').join('') || '<p class="muted">No active medicines.</p>';
+  if (!meds.length) {
+    um.innerHTML = `
+      <div class="up-empty-state">
+        <div class="up-empty-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.5 20.5a5 5 0 1 1-7.07-7.07l9.19-9.19a5 5 0 1 1 7.07 7.07z"></path>
+            <line x1="8.54" y1="11.46" x2="15.61" y2="18.54"></line>
+          </svg>
+        </div>
+        <div class="up-empty-text">
+          <div class="up-empty-title">No active medications</div>
+          <div class="up-empty-desc">Your active prescriptions will appear here.</div>
+        </div>
+      </div>`;
+  } else {
+    um.innerHTML = `<div class="up-row-list">${meds.map(m => {
+      const isVerified = m.verified !== false && m.verified !== 'false';
+      const statusBadge = isVerified 
+        ? `<span class="up-chip badge-verified">Verified • Ready to take</span>`
+        : `<span class="up-chip badge-pending">Verification pending</span>`;
+      const dosageText = m.dosage || (m.strength ? `${m.strength}` : 'As prescribed');
+      return `
+        <div class="up-row">
+          <div class="up-row-icon icon-emerald">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.5 20.5a5 5 0 1 1-7.07-7.07l9.19-9.19a5 5 0 1 1 7.07 7.07z"></path>
+              <line x1="8.54" y1="11.46" x2="15.61" y2="18.54"></line>
+            </svg>
+          </div>
+          <div class="up-row-main">
+            <div class="up-row-title">${esc(m.name)}</div>
+            <div class="up-row-meta">
+              <span>${esc(dosageText)}</span>
+              ${m.durationDays ? `<span class="up-dot">•</span><span>${esc(m.durationDays)} days</span>` : ''}
+            </div>
+          </div>
+          <div class="up-row-right">
+            ${statusBadge}
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
 }
 /* ----- TIMELINE (FIX: shows date + TIME, newest first) ----- */
 function tlTime(tt) {

@@ -17,7 +17,20 @@
     <div class="auth-left">
       <div class="auth-brand-content">
         <div class="brand-top">
-          <div class="mhd-logo-minimal">MHD</div>
+          <div class="mhd-logo-mark">
+            <svg viewBox="0 0 44 44" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="44" height="44" rx="10" fill="url(#logo-grad)"/>
+              <path d="M22 11V33M11 22H33" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+              <path d="M15 15L29 29M29 15L15 29" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="logo-grad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2563EB"/>
+                  <stop offset="1" stop-color="#0284C7"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span class="mhd-logo-text">MHD</span>
+          </div>
           <h1 class="brand-title-minimal">MHD HOSPITAL</h1>
           <div class="brand-subtext-minimal">MY HEALTH DEFENSE HOSPITAL 24×7</div>
           <p class="brand-tagline">One Patient. One Medical Journey.</p>
@@ -26,21 +39,21 @@
         <div class="brand-bottom">
           <div class="trust-indicators">
             <div class="trust-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               <span>24×7 Healthcare Access</span>
             </div>
             <div class="trust-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               <span>Secure Health Records</span>
             </div>
             <div class="trust-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-              <span>AYUSH Integrated Care</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              <span>Patient-Centered Care</span>
             </div>
           </div>
-          <div class="gov-badge-minimal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            BUILT FOR MINISTRY OF AYUSH
+          <div class="sdg-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            <span>ALIGNED WITH THE UNITED NATIONS SUSTAINABLE DEVELOPMENT GOALS</span>
           </div>
         </div>
       </div>
@@ -190,15 +203,15 @@
       </div>
       
       <div class="demo-section-minimal">
-        <details class="demo-details">
-          <summary>Demo accounts</summary>
+        <details class="demo-details" open>
+          <summary>⚡ Instant Demo Accounts</summary>
           <div class="demo-content">
-<div class="demo-row-minimal" style="">
-      <button class="demo-link-minimal" data-act="demo-login" data-role="patient">Patient</button>
-      <button class="demo-link-minimal" data-act="demo-login" data-role="doctor">Doctor</button>
-      <button class="demo-link-minimal" data-act="demo-login" data-role="hospital">Hospital Admin</button>
-    </div>
-    <p class="hint center">Quick demo accounts — created automatically on first use. Password: demo123</p>
+            <div class="demo-row-minimal" style="">
+              <button class="demo-link-minimal" data-act="demo-login" data-role="patient">👤 Patient</button>
+              <button class="demo-link-minimal" data-act="demo-login" data-role="doctor">🩺 Doctor</button>
+              <button class="demo-link-minimal" data-act="demo-login" data-role="hospital">🏥 Hospital Admin</button>
+            </div>
+            <p class="hint center">Tap any role above to enter instantly — no password required!</p>
           </div>
         </details>
       </div>
@@ -402,10 +415,62 @@
 
       <!-- PATIENT UPCOMING -->
       <section id="pg-p-upcoming" class="page hidden">
-        <h3>🗓️ Upcoming Events</h3>
-        <div class="card"><h4>📅 Upcoming Appointments</h4><div id="upAppts" class="list"></div></div>
-        <div class="card"><h4><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg> Follow-up Reminders</h4><div id="upFollow" class="list"></div></div>
-        <div class="card"><h4>💊 Active Medicines</h4><div id="upMeds" class="list"></div></div>
+        <div class="up-container">
+          <!-- Page Header -->
+          <div class="up-header-area">
+            <h1 class="up-title">Upcoming</h1>
+            <p class="up-subtitle">Appointments, follow-ups, and medication reminders</p>
+          </div>
+
+          <!-- 1. Upcoming Appointments -->
+          <div class="up-section">
+            <div class="up-section-header">
+              <div class="up-section-title-group">
+                <svg class="up-section-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h2 class="up-section-title">Upcoming appointments</h2>
+              </div>
+              <button type="button" class="up-link-btn" data-nav="p-appts">View appointment history &rarr;</button>
+            </div>
+            <div id="upAppts" class="up-card-content"></div>
+          </div>
+
+          <!-- 2. Follow-up Reminders -->
+          <div class="up-section">
+            <div class="up-section-header">
+              <div class="up-section-title-group">
+                <svg class="up-section-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <div>
+                  <h2 class="up-section-title">Follow-up reminders</h2>
+                  <p class="up-section-subtitle">Stay on track with your care plan</p>
+                </div>
+              </div>
+            </div>
+            <div id="upFollow" class="up-card-content"></div>
+          </div>
+
+          <!-- 3. Active Medications -->
+          <div class="up-section">
+            <div class="up-section-header">
+              <div class="up-section-title-group">
+                <svg class="up-section-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.5 20.5a5 5 0 1 1-7.07-7.07l9.19-9.19a5 5 0 1 1 7.07 7.07z"></path>
+                  <line x1="8.54" y1="11.46" x2="15.61" y2="18.54"></line>
+                </svg>
+                <h2 class="up-section-title">Active medications</h2>
+              </div>
+              <button type="button" class="up-link-btn" data-nav="p-meds">All medications &rarr;</button>
+            </div>
+            <div id="upMeds" class="up-card-content"></div>
+          </div>
+        </div>
       </section>
 
       <!-- PATIENT MY CASE -->
