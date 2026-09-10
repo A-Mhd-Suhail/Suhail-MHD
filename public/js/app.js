@@ -275,11 +275,11 @@ let CURRENT_CASE = null, CHAT_WITH = null, CURRENT_APTAB = 'upcoming', CURRENT_C
 let dutyWatch = null, lastLocSend = 0, focusDoctorId = null, cvMap = null, markersLayer = null;
 let CURRENT_PAGE = null, NAV_STACK = [];
 
-window.addEventListener('error', e => { try { toast('⚠️ ' + e.message); } catch (_) {} });
-window.addEventListener('unhandledrejection', e => { try { const r = e.reason; toast('⚠️ ' + (r && r.message ? r.message : 'Unexpected error')); } catch (_) {} });
+window.addEventListener('error', e => { try { if (!e || !e.message || e.message === 'Script error.') return; toast('⚠️ ' + e.message); } catch (_) {} });
+window.addEventListener('unhandledrejection', e => { try { const r = e.reason; if (!r || !r.message || r.message === 'Script error.') return; toast('⚠️ ' + (r && r.message ? r.message : 'Unexpected error')); } catch (_) {} });
 function toast(msg) { const el = $('#toastRoot'); if (!el) { console.log('TOAST:', msg); return; } const t2 = document.createElement('div'); t2.className = 'toast'; t2.textContent = msg; el.appendChild(t2); setTimeout(() => t2.remove(), 3500); }
-function showModal(html) { $('#modalCard').innerHTML = html; $('#modalRoot').classList.remove('hidden'); }
-function closeModal() { $('#modalRoot').classList.add('hidden'); }
+function showModal(html) { const mc = $('#modalCard'), mr = $('#modalRoot'); if (mc) mc.innerHTML = html; if (mr) mr.classList.remove('hidden'); }
+function closeModal() { const mr = $('#modalRoot'); if (mr) mr.classList.add('hidden'); }
 function modalCloseBtn() { return '<button class="btn ghost sm" data-act="close-modal" style="margin-top:12px">Close</button>'; }
 function errMsg(err) {
   const c = (err && err.code) ? err.code : '';
@@ -295,7 +295,15 @@ function errMsg(err) {
 }
 
 /* ---------- THEME / FONT ---------- */
-function applyTheme(v) { document.documentElement.dataset.theme = v; localStorage.setItem('mhd_theme', v); ['themeSelAuth', 'themeSel', 'themeSelSet'].forEach(id => { const el = document.getElementById(id); if (el) el.value = v; }); }
+function applyTheme(v) {
+  if (document.documentElement && document.documentElement.dataset) {
+    document.documentElement.dataset.theme = v;
+  } else if (document.documentElement) {
+    document.documentElement.setAttribute('data-theme', v);
+  }
+  localStorage.setItem('mhd_theme', v);
+  ['themeSelAuth', 'themeSel', 'themeSelSet'].forEach(id => { const el = document.getElementById(id); if (el) el.value = v; });
+}
 ['themeSelAuth', 'themeSel', 'themeSelSet'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('change', e => { applyTheme(e.target.value); toast('Theme changed ✅'); }); });
 applyTheme(localStorage.getItem('mhd_theme') || 'light');
 function setFont(v) { document.body.classList.remove('font-sm', 'font-lg'); if (v === 'sm') document.body.classList.add('font-sm'); if (v === 'lg') document.body.classList.add('font-lg'); localStorage.setItem('mhd_font', v); }
@@ -385,8 +393,15 @@ function cleanupSession() {
 }
 async function doLogout() { cleanupSession(); await auth.signOut().catch(() => {}); location.reload(); }
 
-auth.onAuthStateChanged(async user => {
-  if (!user) { $('#screen-auth').classList.remove('hidden'); $('#app').classList.add('hidden'); showAuth('login'); return; }
+if (typeof auth !== 'undefined' && auth && typeof auth.onAuthStateChanged === 'function') {
+  auth.onAuthStateChanged(async user => {
+    if (!user) {
+      const sa = $('#screen-auth'), ap = $('#app');
+      if (sa) sa.classList.remove('hidden');
+      if (ap) ap.classList.add('hidden');
+      showAuth('login');
+      return;
+    }
   try {
     const demoKey = Object.keys(DEMO).find(k => DEMO[k].email === user.email);
     if (demoKey) {
@@ -417,6 +432,7 @@ auth.onAuthStateChanged(async user => {
     enterApp();
   } catch (err) { toast('⚠️ ' + errMsg(err)); }
 });
+}
 
 /* ---------- NAV ---------- */
 const MENUS = {
@@ -1392,18 +1408,23 @@ function chatbotAnswer(q) {
 }
 
 /* ----- SEARCH ----- */
- $('#topSearch').addEventListener('input', e => {
-  const q = e.target.value.trim().toLowerCase();
-  const box = $('#searchResults');
-  if (!q) { box.classList.add('hidden'); return; }
-  go('p-dash', { silent: true }); box.classList.remove('hidden');
-  const hit = s => (s || '').toLowerCase().includes(q);
-  let html = '';
-  STATE.timeline.filter(tt => hit(tt.title) || hit(tt.description)).forEach(tt => html += '<div class="list-item"><div class="li-main"><b>' + (tt.icon || '•') + ' ' + esc(tt.title) + '</b><small>🕐 ' + esc(tt.description || '') + '</small></div><small class="muted">' + fmtD(tt.date) + '</small></div>');
-  STATE.meds.filter(m => hit(m.name)).forEach(m => html += '<div class="list-item"><div class="li-main"><b>💊 ' + esc(m.name) + '</b><small>' + esc(m.dosage || '') + '</small></div>' + medChip(m) + '</div>');
-  STATE.reports.filter(r => hit(r.title) || hit(r.type)).forEach(r => html += '<div class="list-item"><div class="li-main"><b>' + (r.fileData ? '📄' : '🧪') + ' ' + esc(r.title) + '</b><small>' + esc(r.type) + '</small></div><button class="btn ghost sm" data-act="view-doc" data-id="' + r.id + '">👁️ View</button></div>');
-  $('#searchResultsBody').innerHTML = html || '<p class="muted">No matches found.</p>';
-});
+const topSearchEl = $('#topSearch');
+if (topSearchEl) {
+  topSearchEl.addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    const box = $('#searchResults');
+    if (!box) return;
+    if (!q) { box.classList.add('hidden'); return; }
+    go('p-dash', { silent: true }); box.classList.remove('hidden');
+    const hit = s => (s || '').toLowerCase().includes(q);
+    let html = '';
+    STATE.timeline.filter(tt => hit(tt.title) || hit(tt.description)).forEach(tt => html += '<div class="list-item"><div class="li-main"><b>' + (tt.icon || '•') + ' ' + esc(tt.title) + '</b><small>🕐 ' + esc(tt.description || '') + '</small></div><small class="muted">' + fmtD(tt.date) + '</small></div>');
+    STATE.meds.filter(m => hit(m.name)).forEach(m => html += '<div class="list-item"><div class="li-main"><b>💊 ' + esc(m.name) + '</b><small>' + esc(m.dosage || '') + '</small></div>' + medChip(m) + '</div>');
+    STATE.reports.filter(r => hit(r.title) || hit(r.type)).forEach(r => html += '<div class="list-item"><div class="li-main"><b>' + (r.fileData ? '📄' : '🧪') + ' ' + esc(r.title) + '</b><small>' + esc(r.type) + '</small></div><button class="btn ghost sm" data-act="view-doc" data-id="' + r.id + '">👁️ View</button></div>');
+    const bodyEl = $('#searchResultsBody');
+    if (bodyEl) bodyEl.innerHTML = html || '<p class="muted">No matches found.</p>';
+  });
+}
 
 /* ----- CHATBOT UI ----- */
 document.addEventListener('click', e => {
@@ -1412,19 +1433,21 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-act="close-cb"]')) $('#cbModal').classList.add('hidden');
   if (e.target.closest('[data-act="send-cb"]')) sendCB();
 });
- $('#cbInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendCB(); });
-function cbAdd(text, me) { const d = document.createElement('div'); d.className = 'msg ' + (me ? 'me' : 'bot'); d.innerHTML = text; $('#cbMsgs').appendChild(d); $('#cbMsgs').scrollTop = 1e6; }
-function sendCB() { const q = $('#cbInput').value.trim(); if (!q) return; $('#cbInput').value = ''; cbAdd(esc(q), true); setTimeout(() => cbAdd(chatbotAnswer(q)), 350); }
+const cbInEl = $('#cbInput');
+if (cbInEl) cbInEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendCB(); });
+function cbAdd(text, me) { const d = document.createElement('div'); d.className = 'msg ' + (me ? 'me' : 'bot'); d.innerHTML = text; const m = $('#cbMsgs'); if (m) { m.appendChild(d); m.scrollTop = 1e6; } }
+function sendCB() { const inEl = $('#cbInput'); if (!inEl) return; const q = inEl.value.trim(); if (!q) return; inEl.value = ''; cbAdd(esc(q), true); setTimeout(() => cbAdd(chatbotAnswer(q)), 350); }
 
 /* ----- PATIENT ↔ DOCTOR CHAT ----- */
 document.addEventListener('click', e => {
 
   const oc = e.target.closest('[data-act="open-chat"]');
   if (oc) openChat(oc.dataset.id, oc.dataset.name);
-  if (e.target.closest('[data-act="close-chat"]')) $('#chatModal').classList.add('hidden');
+  if (e.target.closest('[data-act="close-chat"]')) { const cm = $('#chatModal'); if (cm) cm.classList.add('hidden'); }
   if (e.target.closest('[data-act="send-chat"]')) sendChat();
 });
- $('#chatInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+const chatInEl = $('#chatInput');
+if (chatInEl) chatInEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
 function openChat(otherId, otherName) {
   CHAT_WITH = { id: otherId, name: otherName };
   $('#chatTitle').textContent = '💬 ' + otherName;
@@ -1778,7 +1801,10 @@ document.addEventListener('click', async e => {
 });
 
 /* ----- PATIENTS (doctor) ----- */
- $('#dpSearch').addEventListener('input', renderPatients);
+const dpSearchEl = $('#dpSearch');
+if (dpSearchEl) {
+  dpSearchEl.addEventListener('input', renderPatients);
+}
 function renderPatients() {
   const el = $('#dpList'); if (!el || ROLE !== 'doctor') return;
   const q = ($('#dpSearch').value || '').trim().toLowerCase();

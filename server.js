@@ -30,9 +30,36 @@ const firebaseConfig = {
   measurementId: "${process.env.FIREBASE_MEASUREMENT_ID || ''}"
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+try {
+  if (typeof firebase !== 'undefined' && firebaseConfig.apiKey && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+} catch(e) {
+  console.warn('Firebase init:', e.message);
+}
+
+const auth = (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) ? firebase.auth() : {
+  onAuthStateChanged: (cb) => { setTimeout(() => cb(null), 0); return () => {}; },
+  signInWithEmailAndPassword: () => Promise.reject(new Error("Firebase Auth is not configured.")),
+  createUserWithEmailAndPassword: () => Promise.reject(new Error("Firebase Auth is not configured.")),
+  sendPasswordResetEmail: () => Promise.reject(new Error("Firebase Auth is not configured.")),
+  signOut: () => Promise.resolve(),
+  setPersistence: () => Promise.resolve()
+};
+
+const db = (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) ? firebase.firestore() : {
+  collection: () => ({
+    doc: () => ({
+      get: () => Promise.resolve({ exists: false, data: () => ({}) }),
+      set: () => Promise.resolve(),
+      update: () => Promise.resolve(),
+      onSnapshot: (cb) => { setTimeout(() => cb({ exists: false, data: () => ({}) }), 0); return () => {}; }
+    }),
+    onSnapshot: (cb) => { setTimeout(() => cb({ docs: [] }), 0); return () => {}; },
+    add: () => Promise.resolve(),
+    where: function() { return this; }
+  })
+};
   `);
 });
 
